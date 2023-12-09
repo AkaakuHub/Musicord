@@ -1,4 +1,7 @@
-import os
+# TODO https://replit.com/talk/announcements/Discord-Music-Bots-Native-Support/50173
+# opusの問題をそのうち解決
+# 
+# import os
 import re
 import glob
 import time
@@ -29,10 +32,6 @@ client = discord.Client(intents=intents)
 tree = app_commands.CommandTree(client)
 
 os.environ["TZ"] = "Asia/Tokyo"
-
-# manual
-with open("data/manual.json", "r", encoding="utf-8") as json_file:
-    man_data = json.load(json_file)
 
 # memberごとにデータを保存する
 with open("data/member.json", "r", encoding="utf-8") as json_file:
@@ -306,6 +305,16 @@ async def on_message(message):
             else:
                 await message.channel.send("エラーが発生しました。")
                 return
+            
+    if message.content == "debug666":
+        if message.guild.voice_client is None:
+            await message.channel.send("ボイスチャンネルに接続していません。")
+            return
+        
+        # すでに再生中なので、一度stopする
+        message.guild.voice_client.stop()
+        source = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio("test.mp3"), volume=0.5)
+        message.guild.voice_client.play(source)
 
 ##別でコマンド実行系###
 async def run_command(kind, command):
